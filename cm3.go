@@ -12,6 +12,7 @@ import (
 
 var _port = regexp.MustCompile(`:\d+$`)
 
+// Returns X-Real-Ip if it is set, r.RemoteAddr without /:\d+$/ otherwise.
 func RemoteIp(r *http.Request) string {
 	if realIp, hasRealIp := r.Header["X-Real-Ip"]; hasRealIp && len(realIp) == 1 {
 		return realIp[0]
@@ -20,6 +21,7 @@ func RemoteIp(r *http.Request) string {
 	}
 }
 
+// Registers the given prometheus metrics and serves them at /metrics.
 func HandleMetrics(metrics ...prometheus.Collector) {
 	for _, m := range metrics {
 		prometheus.MustRegister(m)
@@ -28,6 +30,7 @@ func HandleMetrics(metrics ...prometheus.Collector) {
 	http.Handle("/metrics", promhttp.Handler())
 }
 
+// Registers an http handler using http.HandleFunc and logs all requests.
 func HandleFunc(location string, handler func(w http.ResponseWriter, r *http.Request)) {
 	if handler != nil {
 		http.HandleFunc(location, func(w http.ResponseWriter, r *http.Request) {
