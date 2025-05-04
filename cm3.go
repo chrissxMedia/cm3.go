@@ -4,10 +4,21 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"regexp"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
+
+var _port = regexp.MustCompile(`:\d+$`)
+
+func RemoteIp(r *http.Request) string {
+	if realIp, hasRealIp := r.Header["X-Real-Ip"]; hasRealIp && len(realIp) == 1 {
+		return realIp[0]
+	} else {
+		return _port.ReplaceAllString(r.RemoteAddr, "")
+	}
+}
 
 func HandleMetrics(metrics ...prometheus.Collector) {
 	for _, m := range metrics {
@@ -21,7 +32,7 @@ func HandleFunc(location string, handler func(w http.ResponseWriter, r *http.Req
 	if handler != nil {
 		http.HandleFunc(location, func(w http.ResponseWriter, r *http.Request) {
 			log.Println(fmt.Sprintf("%s %s %s from %s (%s) to %s",
-				r.Method, r.URL.Path, r.Proto, r.RemoteAddr, r.UserAgent(), r.Host))
+				r.Method, r.URL.Path, r.Proto, RemoteIp(r), r.UserAgent(), r.Host))
 			handler(w, r)
 		})
 	}
