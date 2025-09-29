@@ -34,8 +34,8 @@ func HandleMetrics(metrics ...prometheus.Collector) {
 func HandleFunc(location string, handler func(w http.ResponseWriter, r *http.Request)) {
 	if handler != nil {
 		http.HandleFunc(location, func(w http.ResponseWriter, r *http.Request) {
-			log.Println(fmt.Sprintf("%s %s %s from %s (%s) to %s",
-				r.Method, r.URL.Path, r.Proto, RemoteIp(r), r.UserAgent(), r.Host))
+			log.Printf("%s %s %s from %s (%s) to %s\n",
+				r.Method, r.URL.Path, r.Proto, RemoteIp(r), r.UserAgent(), r.Host)
 			handler(w, r)
 		})
 	}
