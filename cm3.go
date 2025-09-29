@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"regexp"
+	"strings"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -13,12 +14,17 @@ import (
 var _port = regexp.MustCompile(`:\d+$`)
 
 // Returns X-Real-Ip if it is set, r.RemoteAddr without /:\d+$/ otherwise.
+// Removes all occurances of `[` and `]`.
 func RemoteIp(r *http.Request) string {
+	var ip string
 	if realIp, hasRealIp := r.Header["X-Real-Ip"]; hasRealIp && len(realIp) == 1 {
-		return realIp[0]
+		ip = realIp[0]
 	} else {
-		return _port.ReplaceAllString(r.RemoteAddr, "")
+		ip = _port.ReplaceAllString(r.RemoteAddr, "")
 	}
+	ip = strings.ReplaceAll(ip, "[", "")
+	ip = strings.ReplaceAll(ip, "]", "")
+	return ip
 }
 
 // Registers the given prometheus metrics and serves them at /metrics.
