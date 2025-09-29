@@ -1,7 +1,6 @@
 package cm3
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"regexp"
