@@ -13,7 +13,7 @@ import (
 var _port = regexp.MustCompile(`:\d+$`)
 
 // Returns X-Real-Ip if it is set, r.RemoteAddr without /:\d+$/ otherwise.
-// Removes all occurances of `[` and `]`.
+// Removes all occurrences of `[` and `]`.
 func RemoteIp(r *http.Request) string {
 	var ip string
 	if realIp, hasRealIp := r.Header["X-Real-Ip"]; hasRealIp && len(realIp) == 1 {
